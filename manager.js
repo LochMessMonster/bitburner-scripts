@@ -13,11 +13,11 @@ const scriptServerRack  = "scripts/purchase/server-rack.js";
 /** @param {import(".").NS } ns */
 export async function main(ns) {
     // Enforce only 1 instance of manager
-    if (ns.isRunning(scriptManager)) {
-        // ns.killall(home, true);
-        ns.tprint("Please stop other instances of manager.")
-        ns.exit();
-    }
+    // if (ns.isRunning(scriptManager)) {
+    //     // ns.killall(home, true);
+    //     ns.tprint("Please stop other instances of manager.")
+    //     ns.exit();
+    // }
 
     // Calculate time since last augment reset
     let timeSinceLastAugMs = Math.abs(Date.now() - ns.getResetInfo().lastAugReset);
