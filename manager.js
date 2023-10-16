@@ -40,14 +40,19 @@ async function manage(ns) {
     const levelStep = 100, moneyStep = 5000000;
     let levelCurr, moneyCurr;
 
+    let spiderDepth = 100;
+
     let doManage = true;
     while (doManage) {
-        hotStart(ns);
+        await hotStart(ns, spiderDepth);
         await ns.sleep(600000); // 10 min
+
+        // increment spider depth
+        spiderDepth += 100;
 
         // purchase and fill up server rack
         // ns.run(scriptServerRack);
-        // purchase useful items
+        // purchase useful itemsdoManage
         // ns.run(scriptShopping);
 
         // If a 'threshold' is reached, notify player and stop managing.
@@ -65,9 +70,9 @@ async function manage(ns) {
 }
 
 /** @param {import(".").NS } ns */
-async function hotStart (ns) {
+async function hotStart (ns, spiderDepth) {
     ns.run(scriptStopAuto);
-    ns.run(scriptSpider);
+    ns.run(scriptSpider, 1, spiderDepth);
     await ns.sleep(15000); // 15 sec
     ns.run(scriptStartAuto);
 }
@@ -87,7 +92,7 @@ async function coldStart (ns) {
         // Start XP farm
         if (levelCurr < levelThreshold) {
             ns.run(scriptXpFarm); // is this needed?
-            hotStart(ns);
+            await hotStart(ns, 50);
         }
         await ns.sleep(300000); // 5 mins
     }
