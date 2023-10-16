@@ -10,7 +10,7 @@ export async function main(ns) {
   let nukedServers = [], failedServers = [];
 
   // define how far to go. default 10
-  let nodeCount = 0, nodeLimit = 20; 
+  let nodeCount = 0, nodeLimit = 50; 
   
   if (ns.args > 0) {
     nodeLimit = ns.args[0];
