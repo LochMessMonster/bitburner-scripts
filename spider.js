@@ -12,7 +12,6 @@ export async function main(ns) {
   // define how far to go. default 10
   let nodeCount = 0, nodeLimit = 20;
   
-  let scanDepth = 0, scanDepthLimit = 5;
   if (ns.args > 0) {
     nodeLimit = ns.args[0];
   }
@@ -70,8 +69,6 @@ export async function main(ns) {
     }
   }
 
-  ns.
-
   outputt(ns, nukedServers, "nuked");
   outputt(ns, failedServers, "failed");
   outputt(ns, blacklist, "blacklist");
@@ -82,13 +79,9 @@ export async function main(ns) {
 function portHack(ns, server) {
   // Ports available to hack
   const portList = getPortScripts(ns);
-  // const hackThresh = 100;
 
   if (ns.serverExists(server)) {
     let numPorts = ns.getServerNumPortsRequired(server);
-
-    // check server is within hacking threshold
-    // let isHackable = ns.getServerRequiredHackingLevel(server) <= (ns.getHackingLevel() + hackThresh);
 
     // if hackable
     if (numPorts <= portList.length) {
@@ -98,17 +91,6 @@ function portHack(ns, server) {
       //nukem
       ns.nuke(server);
       return true;
-      
-      // // open up reqd num of ports
-      // for (let i = 0; i < numPorts; i++) {
-      //   switch (portList[i]) {
-      //     case 'ssh': ns.brutessh(server); break;
-      //     case 'ftp': ns.ftpcrack(server); break;
-      //     case 'smtp': ns.relaysmtp(server); break;
-      //     case 'http': ns.httpworm(server); break;
-      //     case 'sql': ns.sqlinject(server); break;
-      //   }
-      // }
     }
   }
   return false;
@@ -129,7 +111,6 @@ async function outputt(ns, serverArr, filename) {
   });
 }
 
-/** @param {import(".").NS } ns */
 /** @param {NS} ns */
 async function getPortScripts(ns) {
   let portScripts = {
@@ -150,7 +131,6 @@ async function getPortScripts(ns) {
   return availableScripts;
 }
 
-/** @param {NS} ns */
 class Queue {
   constructor() {
     this.items = [];
