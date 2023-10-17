@@ -10,6 +10,11 @@ const scriptShopping    = "scripts/purchase/shopping.js"
 const scriptServerRack  = "scripts/purchase/server-rack.js";
 // const scriptSetup = "upload.js";
 
+const filepathTarget    = "servers/nuked.txt"
+const filepathFailed    = "servers/failed.txt"
+const filepathBlacklist = "servers/blacklist.txt"
+const defaultThreads    = 1;
+
 /** @param {import(".").NS } ns */
 export async function main(ns) {
     // Enforce only 1 instance of manager
@@ -66,10 +71,10 @@ async function manage(ns) {
 
 /** @param {import(".").NS } ns */
 async function hotStart (ns) {
-    ns.run(scriptStopAuto);
+    ns.run(scriptStopAuto, defaultThreads, scriptHack, filepathTarget);
     ns.run(scriptSpider);
     await ns.sleep(15000); // 15 sec
-    ns.run(scriptStartAuto);
+    ns.run(scriptStartAuto, defaultThreads, scriptHack, filepathTarget);
 }
 
 // Cold starts are resets. The goal is to accumulate money and hack-level till 100
