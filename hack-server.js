@@ -9,7 +9,7 @@ export async function main(ns) {
     var server;
     if (ns.args.length > 0) {
       server = ns.args[0];
-      ns.tprint("Starting hack for: " + server);
+      // ns.tprint("Starting hack for: " + server);
     } else {
       ns.tprint("No server provided.")
       ns.exit();
