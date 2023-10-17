@@ -3,18 +3,27 @@
  * - Uses BFS approach
  */
 
+import { loadServerFile, saveServerFile } from "scripts/helpers/hack-utils.js"
+import { Queue } from "scripts/helpers/classes.js"
+
+const home              = "home";
+const filepathTarget    = "servers/nuked.txt"
+const filepathFailed    = "servers/failed.txt"
+const filepathBlacklist = "servers/blacklist.txt"
+
 /** @param {NS} ns */
 export async function main(ns) {
-  const home = "home";
-  let blacklist = ns.getPurchasedServers().concat([home]);
-  let nukedServers = [], failedServers = [];
-
-  // define how far to go. default 10
+  // define how far to go. default 50
   let nodeCount = 0, nodeLimit = 50; 
-  
   if (ns.args > 0) {
     nodeLimit = ns.args[0];
   }
+
+  let failedServers = [];
+  // add home/owned servers to blacklist
+  let blacklist = ns.getPurchasedServers().concat([home]);
+  // load target list to skip these nodes
+  let nukedServers = loadServerFile(ns, filepathTarget);
 
   // get list of servers from home excluding purchased servers
   let serverQueue = new Queue();
@@ -69,9 +78,9 @@ export async function main(ns) {
     }
   }
 
-  outputt(ns, nukedServers, "nuked");
-  outputt(ns, failedServers, "failed");
-  outputt(ns, blacklist, "blacklist");
+  saveServerFile(ns, nukedServers, filepathTarget);
+  saveServerFile(ns, failedServers, filepathFailed);
+  saveServerFile(ns, blacklist, filepathBlacklist);
 }
 
 /** @param {import(".").NS } ns */
@@ -96,21 +105,6 @@ function portHack(ns, server) {
   return false;
 }
 
-
-/** @param {NS} ns */
-async function outputt(ns, serverArr, filename) {
-  let filepath = "servers/" + filename + ".txt";
-
-  // delete file if exist
-  if (ns.fileExists(filepath)) {
-    ns.rm(filepath);
-  }
-  // output
-  serverArr.forEach(async (srv) => {
-    await ns.write(filepath, srv + "\n", "a");
-  });
-}
-
 /** @param {NS} ns */
 async function getPortScripts(ns) {
   let portScripts = {
@@ -129,35 +123,4 @@ async function getPortScripts(ns) {
     }
   });
   return availableScripts;
-}
-
-class Queue {
-  constructor() {
-    this.items = [];
-  }
-
-  enqueue(item) {
-    return this.items.push(item);
-  }
-
-  // O(n) complexity find smth better
-  dequeue() {
-    return this.items.shift();
-  }
-
-  peekq() {
-    return this.items[0];
-  }
-
-  contains(item) {
-    return this.items.includes(item);
-  }
-
-  isEmtpy() {
-    return (this.items.length == 0);
-  }
-
-  get length() {
-    return this.items.length;
-  }
 }
