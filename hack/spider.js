@@ -23,7 +23,8 @@ export async function main(ns) {
   // add home/owned servers to blacklist
   let blacklist = ns.getPurchasedServers().concat([home]);
   // load target list to skip these nodes
-  let nukedServers = loadServerFile(ns, filepathTarget);
+  // let nukedServers = loadServerFile(ns, filepathTarget);
+  let nukedServers = [];
 
   // get list of servers from home excluding purchased servers
   let serverQueue = new Queue();
@@ -37,14 +38,6 @@ export async function main(ns) {
   while (!serverQueue.isEmtpy()) {
     let currentServer = serverQueue.dequeue();
 
-    // check if visited / nuked / blacklisted
-    let visited = nukedServers.includes(currentServer) || failedServers.includes(currentServer) || blacklist.includes(currentServer);
-    if (visited) {
-      continue;
-    } else {
-      nodeCount++;
-    }
-
     // SCAN //
     // if at/below scan limit, scan servers
     if (nodeCount <= nodeLimit) {
@@ -55,6 +48,14 @@ export async function main(ns) {
           serverQueue.enqueue(srv);
         }
       });
+    }
+    
+    // check if visited / nuked / blacklisted
+    let visited = nukedServers.includes(currentServer) || failedServers.includes(currentServer) || blacklist.includes(currentServer);
+    if (visited) {
+      continue;
+    } else {
+      nodeCount++;
     }
 
     // ENSLAVE //
