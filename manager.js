@@ -1,13 +1,12 @@
-
 const home              = "home"
-const scriptManager     = "scripts/hack/manager.js";
+const scriptManager     = "scripts/manager.js";
 const scriptXpFarm      = "scripts/hack/xp-farm.js";
 const scriptHack        = "scripts/hack/hack-server.js";
 const scriptStartAuto   = "scripts/hack/start-automate.js";
 const scriptStopAuto    = "scripts/hack/stop-automate.js";
 const scriptSpider      = "scripts/hack/spider.js";
-const scriptShopping    = "scripts/purchase/shopping.js"
-const scriptServerRack  = "scripts/purchase/server-rack.js";
+const scriptShopping    = "scripts/shop/shopping.js"
+const scriptServerRack  = "scripts/shop/server-rack.js";
 // const scriptSetup = "upload.js";
 
 const filepathTarget    = "servers/nuked.txt"
@@ -27,6 +26,7 @@ export async function main(ns) {
     // Calculate time since last augment reset
     let timeSinceLastAugMs = Math.abs(Date.now() - ns.getResetInfo().lastAugReset);
     let timeSinceLastAugMin = Math.floor( (timeSinceLastAugMs/1000)/60 );
+    
     ns.tprintf("Time since last aug reset: %ds | %d mins | %d hrs", timeSinceLastAugMs/1000, timeSinceLastAugMin, timeSinceLastAugMin/60 );
     
     // if aug-reset was less than 10mins, cold start
@@ -34,6 +34,7 @@ export async function main(ns) {
         ns.tprint("Cold Start");
         await coldStart(ns);
     }
+    
     ns.tprint("Starting manager");
     await manage(ns);
 
@@ -45,34 +46,38 @@ async function manage(ns) {
     const levelStep = 100, moneyStep = 5000000;
     let levelCurr, moneyCurr;
 
+    let spiderDepth = 100;
+
+
     let doManage = true;
     while (doManage) {
-        hotStart(ns);
+        await hotStart(ns, spiderDepth);
         await ns.sleep(600000); // 10 min
 
+        // increment spider depth
+        spiderDepth += 100;
+
         // purchase and fill up server rack
-        // ns.run(scriptServerRack);
+        ns.run(scriptServerRack);
         // purchase useful items
         // ns.run(scriptShopping);
 
-        // If a 'threshold' is reached, notify player and stop managing.
+        // If a 'threshold' is reached, notify player.
         levelCurr = ns.getHackingLevel();
         moneyCurr = ns.getServerMoneyAvailable("home");
         if( (levelCurr % levelStep == 0 ) || (moneyCurr % moneyStep == 0)) {
             ns.tprint("Hacking level reached: " + levelCurr);
             ns.tprint("Money reached: " + moneyCurr);
-            doManage = false;
-            
-            await ns.alert("Set threshold reached. Stopping manager.")
+            // doManage = false;
         }
     }
 
 }
 
 /** @param {import(".").NS } ns */
-async function hotStart (ns) {
+async function hotStart (ns, spiderDepth) {
     ns.run(scriptStopAuto, defaultThreads, scriptHack, filepathTarget);
-    ns.run(scriptSpider);
+    ns.run(scriptSpider, defaultThreads, spiderDepth);
     await ns.sleep(15000); // 15 sec
     ns.run(scriptStartAuto, defaultThreads, scriptHack, filepathTarget);
 }
@@ -92,7 +97,7 @@ async function coldStart (ns) {
         // Start XP farm
         if (levelCurr < levelThreshold) {
             ns.run(scriptXpFarm); // is this needed?
-            hotStart(ns);
+            await hotStart(ns, 50);
         }
         await ns.sleep(300000); // 5 mins
     }
