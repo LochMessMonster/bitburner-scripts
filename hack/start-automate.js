@@ -25,7 +25,7 @@ export async function main(ns) {
   
       // number of scripts the server can run
       numOfScriptsToRun = Math.floor(serverRamMax / hackScriptRam)
-      ns.tprintf("Server '%s' can run: %d", hostList[i], numOfScriptsToRun);
+      ns.printf("Server '%s' can run: %d", hostList[i], numOfScriptsToRun);
   
       // if server can't run script, move to next
       if (numOfScriptsToRun <= 0) {
@@ -33,7 +33,7 @@ export async function main(ns) {
       } else if (numOfScriptsToRun > targetList.length) {
         // if num exceeds list of servers, use server count instead
         numOfScriptsToRun = targetList.length;
-        ns.tprintf("Server '%s' set to run: %d", hostList[i], numOfScriptsToRun);
+        ns.printf("Server '%s' set to run: %d", hostList[i], numOfScriptsToRun);
       }
   
       // Upload hack script if not on server
