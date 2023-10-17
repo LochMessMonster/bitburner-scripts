@@ -1,12 +1,12 @@
 const home              = "home"
-const scriptManager     = "scripts/hack/manager.js";
+const scriptManager     = "scripts/manager.js";
 const scriptXpFarm      = "scripts/hack/xp-farm.js";
 const scriptHack        = "scripts/hack/hack-server.js";
 const scriptStartAuto   = "scripts/hack/start-automate.js";
 const scriptStopAuto    = "scripts/hack/stop-automate.js";
 const scriptSpider      = "scripts/hack/spider.js";
-const scriptShopping    = "scripts/purchase/shopping.js"
-const scriptServerRack  = "scripts/purchase/server-rack.js";
+const scriptShopping    = "scripts/shop/shopping.js"
+const scriptServerRack  = "scripts/shop/server-rack.js";
 // const scriptSetup = "upload.js";
 
 /** @param {import(".").NS } ns */
@@ -53,7 +53,7 @@ async function manage(ns) {
         spiderDepth += 100;
 
         // purchase and fill up server rack
-        // ns.run(scriptServerRack);
+        ns.run(scriptServerRack);
         // purchase useful items
         // ns.run(scriptShopping);
 
