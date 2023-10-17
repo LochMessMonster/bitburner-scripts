@@ -57,15 +57,13 @@ async function manage(ns) {
         // purchase useful items
         // ns.run(scriptShopping);
 
-        // If a 'threshold' is reached, notify player and stop managing.
+        // If a 'threshold' is reached, notify player.
         levelCurr = ns.getHackingLevel();
         moneyCurr = ns.getServerMoneyAvailable("home");
         if( (levelCurr % levelStep == 0 ) || (moneyCurr % moneyStep == 0)) {
             ns.tprint("Hacking level reached: " + levelCurr);
             ns.tprint("Money reached: " + moneyCurr);
-            doManage = false;
-            
-            await ns.alert("Set threshold reached. Stopping manager.")
+            // doManage = false;
         }
     }
 
