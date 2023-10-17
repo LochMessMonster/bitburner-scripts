@@ -1,4 +1,5 @@
 const LINE_BREAK = "\n"
+const home = "home"
 
 /** @param {import("../").NS } ns */
 /** @param {NS} ns */
@@ -28,4 +29,9 @@ export function saveServerFile(ns, serverArray, filepath) {
   serverArray.forEach(async (srv) => {
     ns.write(filepath, srv + LINE_BREAK, "a");
   });
+}
+
+/** @param {import("../").NS } ns */
+export function uploadScripts(ns, server, filepath) {
+  ns.scp(filepath, server, home)
 }
