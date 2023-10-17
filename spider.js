@@ -49,8 +49,8 @@ export async function main(ns) {
     }
 
     // ENSLAVE //
-    // if current server has no max money, add to blacklist for investigation
-    if (ns.getServerMaxMoney(currentServer) <= 0.0) {
+    // if current server has no max money or ram, add to blacklist for investigation
+    if ((ns.getServerMaxMoney(currentServer) <= 0) || (ns.getServerMaxRam(currentServer) <= 0)) {
       blacklist.push(currentServer);
       continue;
     }
