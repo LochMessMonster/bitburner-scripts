@@ -2,7 +2,7 @@
  * @param {NS} ns 
  * @param {server} target-server
  */
-export async function main(ns, server) {
+export async function main(ns) {
     // pre-reqs - potentially import to util scripts
     ns.disableLog("getServerMoneyAvailable");
   
@@ -15,53 +15,24 @@ export async function main(ns, server) {
       ns.exit();
     }
   
+    // min/max thresholds for server money
+    const moneyMin = ns.getServerMaxMoney(server) * 0.40;
+    // const moneyMax = ns.getServerMaxMoney(server) * 0.80;
+    // hack thresholds for server security level
+    // const hackMin = ns.getServerMinSecurityLevel(server);
+    const hackMax = 85;
   
-    var hack_chance, moneyCurr;
+    var hackCurr, moneyCurr;
     while (true) {
-      hack_chance = ns.hackAnalyzeChance(server);
+      hackCurr = ns.getServerSecurityLevel(server);
       moneyCurr = ns.getServerMoneyAvailable(server);
   
-      if (hack_chance < 0.69) {
-        ns.printf("Reached min. hack-chance threshold (%d) on %s. Beginning weakening...", hack_chance, server);
-        weakenSrv(ns, server);
-      } else if (moneyCurr <= 10000) {
-        ns.printf("Reached min. money threshold (%d) on %s. Beginning growth...", moneyCurr, server);
-        growSrv(ns, server);
+      if (moneyCurr <= moneyMin) {
+        await ns.grow(server)
+      } else if (hackCurr > hackMax) {
+        await ns.weaken(server)
       } else {
         await ns.hack(server);
       }
     }
-  
-  
-  
-  }
-  
-  // Weaken till hack chance is > 95%
-  async function weakenSrv(ns, server) {
-    var hack_chance;
-  
-    while (true) {
-      if (hack_chance <= 0.95) {
-        await ns.weaken(server);
-        hack_chance = ns.hackAnalyzeChance(server);
-      } else {
-        break;
-      }
-    }
-    ns.print("Reached max. hack-chance threshold.");
-  }
-  
-  // Grow money till max
-  async function growSrv(ns, server) {
-    var moneyCurr = ns.getServerMoneyAvailable(server);
-    var moneyMax = ns.getServerMaxMoney(server);
-  
-    while (true) {
-      if (moneyCurr < moneyMax) {
-        moneyCurr *= await ns.grow(server);
-      } else {
-        break;
-      }
-    }
-    ns.print("Reached max money on server.")
   }
