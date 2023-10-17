@@ -1,16 +1,22 @@
+
+let scriptHack = "scripts/hack/hack-server.js";
+let targetFilePath = "servers/nuked.txt";
+let defaultThreads = 1;
+
 /** @param {NS} ns */
 export async function main(ns) {
-    const targetFilePath = "servers/nuked.txt";
+    // use args if passed in
+    if (ns.args.length === 2) {
+        scriptHack = ns.args[0];
+        targetFilePath = ns.args[1];
+        // defaultThreads = ns.args[2]
+    }
   
     // const targetList = ["hong-fang-tea", "foodnstuff", "sigma-cosmetics", "joesguns", "iron-gym", "harakiri-sushi", "phantasy", "n00dles"];
     const targetList = getTargetList(ns, targetFilePath);
     const hostList = ns.getPurchasedServers().concat(targetList);
   
-  
-    const hackScript = "hack-server-v2.js";
-    const defaultThreads = 1; // change to auto-determine?
-  
-    const hackScriptRam = ns.getScriptRam(hackScript);
+    const hackScriptRam = ns.getScriptRam(scriptHack);
     let serverRamMax, numOfScriptsToRun;
   
     // Loop through servers starting hack-server script for each srvr.
@@ -31,13 +37,13 @@ export async function main(ns) {
       }
   
       // Upload hack script if not on server
-      if (!ns.fileExists(hackScript, hostList[i])) {
-        ns.scp(hackScript, hostList[i]);
+      if (!ns.fileExists(scriptHack, hostList[i])) {
+        ns.scp(scriptHack, hostList[i]);
       }
   
       // start as many hack script as possible
       for (let j = 0; j < numOfScriptsToRun; j++) {
-        ns.exec(hackScript, hostList[i], defaultThreads, targetList[j]);
+        ns.exec(scriptHack, hostList[i], defaultThreads, targetList[j]);
       }
     }
   }

@@ -1,6 +1,14 @@
+
+let scriptHack = "scripts/hack/hack-server.js";
+let targetFilePath = "servers/nuked.txt";
+
 /** @param {NS} ns */
 export async function main(ns) {
-    const targetFilePath = "servers/nuked.txt";
+  // use args if passed in
+  if (ns.args.length === 2) {
+      scriptHack = ns.args[0];
+      targetFilePath = ns.args[1];
+  }
   
     // const targetList = ["hong-fang-tea", "foodnstuff", "sigma-cosmetics", "joesguns", "iron-gym", "harakiri-sushi", "phantasy", "n00dles"];
     const targetList = getTargetList(ns, targetFilePath);
