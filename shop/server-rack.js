@@ -4,14 +4,14 @@ const home = "home"
 const minRamPurchase = 8;
 const upgradeLimit = "8 TB"//format
 
-/** @param {import(".").NS } ns */
+/** @param {import("..").NS } ns */
 export async function main(ns) {
     let status = maintainRack(ns);
     ns.print(status);
     return status;
 }
 
-/** @param {import(".").NS } ns */
+/** @param {import("..").NS } ns */
 function maintainRack(ns) {
     let srvList = ns.getPurchasedServers();
     let srvCount = srvList.length;
@@ -28,7 +28,7 @@ function maintainRack(ns) {
     return  {"FULL": !rackHasEmptySlots, "MAXED": !rackCanUpgrade }; 
 }
 
-/** @param {import(".").NS } ns */
+/** @param {import("..").NS } ns */
 // Fill up rack based on current money
 function fillRack(ns, ram, currentMoney, emptySlots, srvCount) {
     // No empty slots
@@ -52,7 +52,7 @@ function fillRack(ns, ram, currentMoney, emptySlots, srvCount) {
 function upgradeRack(ns, currentMoney, srvList) {}
 
 // Purchase specified number of servers
-/** @param {import(".").NS } ns */
+/** @param {import("..").NS } ns */
 function purchase(ns, amount, ram, srvCount) {
     let hostname;
     let purchased = 0;
