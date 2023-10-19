@@ -33,5 +33,25 @@ export function saveServerFile(ns, serverArray, filepath) {
 
 /** @param {import("../").NS } ns */
 export function uploadScripts(ns, server, filepath) {
-  ns.scp(filepath, server, home)
+  ns.scp(filepath, server, home);
+}
+
+/** @param {NS} ns */
+export async function getPortScripts(ns) {
+  let portScripts = {
+    "BruteSSH.exe" : {port: "ssh", run: ns.brutessh},
+    "FTPCrack.exe" : {port: "ftp", run: ns.ftpcrack},
+    "relaySMTP.exe" :{port:  "smtp", run: ns.relaysmtp},
+    "HTTPWorm.exe" : {port: "http", run: ns.httpworm},
+    "SQLInject.exe" : {port: "sql", run: ns.sqlinject},
+  }
+  
+  // Filter available scripts
+  let availableScripts = [];
+  Object.keys(portScripts).forEach(script => {
+    if (ns.fileExists(script, "home")) {
+      availableScripts.push(portScripts[script]);
+    }
+  });
+  return availableScripts;
 }

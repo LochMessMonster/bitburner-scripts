@@ -3,7 +3,7 @@
  * - Uses BFS approach
  */
 
-import { loadServerFile, saveServerFile } from "scripts/helpers/hack-utils.js"
+import { loadServerFile, saveServerFile, getPortScripts } from "scripts/helpers/hack-utils.js"
 import { Queue } from "scripts/helpers/classes.js"
 
 const home              = "home";
@@ -104,24 +104,4 @@ function portHack(ns, server) {
     }
   }
   return false;
-}
-
-/** @param {NS} ns */
-async function getPortScripts(ns) {
-  let portScripts = {
-    "BruteSSH.exe" : {port: "ssh", run: ns.brutessh},
-    "FTPCrack.exe" : {port: "ftp", run: ns.ftpcrack},
-    "relaySMTP.exe" :{port:  "smtp", run: ns.relaysmtp},
-    "HTTPWorm.exe" : {port: "http", run: ns.httpworm},
-    "SQLInject.exe" : {port: "sql", run: ns.sqlinject},
-  }
-  
-  // Filter available scripts
-  let availableScripts = [];
-  Object.keys(portScripts).forEach(script => {
-    if (ns.fileExists(script, "home")) {
-      availableScripts.push(portScripts[script]);
-    }
-  });
-  return availableScripts;
 }
