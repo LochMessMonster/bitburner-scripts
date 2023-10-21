@@ -1,3 +1,4 @@
+import { Server } from "/../NetscriptDefinitions";
 
 export class Queue<T> {
     private _queue: T[];
@@ -62,4 +63,9 @@ export interface Port {
     name: string,
     program: string,
     run: { (host: string): void; }
+}
+
+export interface HackThresholds {
+    server: string,
+    threshold: number
 }

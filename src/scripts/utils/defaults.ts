@@ -1,4 +1,4 @@
-// import { Script } from "scripts/utils/classes";
+import { HackThresholds } from "scripts/utils/classes";
 
 // home server
 export const home               = "home";
@@ -43,3 +43,9 @@ export const scriptStop         = "scripts/hack/stop-automate.js"
 export const scriptPorts        = "scripts/shop/ports.js"
 export const scriptServerRack   = "scripts/shop/server-rack.js"
 export const scriptManager      = "scripts/manager.js"
+
+export const serverHackThreshold : HackThresholds[] = [
+    {server: "joesguns", threshold: 200},
+    {server: "phantasy", threshold: 1000},
+    {server: "rho-construction", threshold: 2500}
+]

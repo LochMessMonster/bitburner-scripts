@@ -16,11 +16,31 @@ export async function main(ns: NS): Promise<void> {
   // Server list of targets (target of scripts)
   let targetList = prepareServerTargetList(ns, nukedServers);
 
-  let time = 0;
+  
+  let target = getTarget(ns, targetList); 
 
-  for (let i = 0, j = 0; i < hostList.length && j < targetList.length; i++, j++) {
+  
+  
+  
+
+
+
+
+
+
+  // Let all hosts target 1 server
+  // let target = targetList[0];
+  // let target = "phantasy";
+  if (target === undefined) {
+    ns.tprint("Target is undefined");
+    ns.exit();
+  } else {
+    ns.tprint("Targeting: " + target);
+  }
+
+  let waitTime = 0;
+  for (let i = 0; i < hostList.length; i++) {
     let host = hostList[i];
-    let target = targetList[j];
 
     // Upload HGW scripts to host
     uploadScripts(ns, host, scriptsHGW);
@@ -67,16 +87,32 @@ export async function main(ns: NS): Promise<void> {
 
 
     // Set time to the longest of script times
-    time = Math.max(time, actionTime);
+    waitTime = Math.max(waitTime, actionTime);
 
 
     let pid = ns.exec(script, host, threadsAvailable, target);
     if (pid === 0) continue;
   }
   
-  time += 60000; // add on 1 min margin
-  // ns.printf("Sleeping for %d mins, %d sec", (time/1000)/60, (time/1000) )
-  // await ns.sleep(time);
+  waitTime += 5000; // add 5 sec margin
+  ns.printf("Sleeping for %d mins, %d sec", (waitTime/1000)/60, (waitTime/1000) );
+  await ns.sleep(waitTime);
+}
+
+// add check if target is in array
+function getTarget(ns:NS, targetArray: string[]) {
+  const hackLevel = ns.getHackingLevel();
+
+  let target = "";
+
+  for (const srvThresh of Defaults.serverHackThreshold) {
+    if (srvThresh.threshold > hackLevel) {
+      target = srvThresh.server;
+      break;
+    }
+  }
+
+  return target;
 }
 
 /**
@@ -194,44 +230,3 @@ function rankServerByMaxMoney(ns: NS, serverArray: string[]) : string[] {
 
 //     }
 // }
-
-
-//   let ramUsable = Math.floor((ramMax - ramUsed ) / scriptRamA) * scriptRamA;
-
-//   // skip host if can't run scripts
-//   if (ramUsable < scriptRamA) continue;
-
-//   // Run step to kill all scripts before this
-
-//   // Upload scripts to host
-//   uploadScripts(ns, host, scriptsHGW);
-
-
-//   ns.getGrowTime()
-// }
-
-// // Loop through servers starting hack-server script for each srvr.
-// for (let i = 0; i < hostList.length; i++) {
-//     let host = hostList[i];
-//     let hostMaxRam = ns.getServerMaxRam(host);
-
-//     // number of scripts the server can run
-//     numOfScriptsToRun = Math.floor((ns.getServerMaxRam(host) - ns.getServerUsedRam(host)) / scriptRam["Hack"]);
-//     ns.printf("Server '%s' can run: %d", host, numOfScriptsToRun);
-
-//     // if server can't run script, move to next
-//     if (numOfScriptsToRun <= 0) {
-//       continue;
-//     } else if (numOfScriptsToRun > targetList.length) {
-//       // if num exceeds list of servers, use server count instead
-//       numOfScriptsToRun = targetList.length;
-//       ns.printf("Server '%s' set to run: %d", host, numOfScriptsToRun);
-//     }
-
-//     // Upload scripts to host
-//     uploadScripts(ns, host, scriptsHGW);
-
-//     // start as many hack script as possible
-//     for (let j = 0; j < numOfScriptsToRun; j++) {
-//       ns.exec(Defaults.scriptHack, host, defaultThreads, targetList[j]);
-//     }

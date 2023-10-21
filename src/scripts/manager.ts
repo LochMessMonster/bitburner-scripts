@@ -71,10 +71,11 @@ async function hotStart(ns: NS, spiderDepth: number) {
     // Run auto-start
 
     let pid = ns.run(Defaults.scriptStart, 1);
-    // poll auto-start script if still running every 30 sec 
-    // if (pid == 0) {ns.tprint("ERROR"); ns.exit(); }
+    // if pid is 0, script failed
+    if (pid == 0) {ns.tprint("ERROR"); ns.exit(); }
 
-    await (ns.sleep(60000)) // 1 min
+    // poll auto-start script if still running every 30 sec 
+    while (ns.isRunning(pid)) { await ns.sleep(30000); }
 }
 
 async function coldStart(ns: NS) {
