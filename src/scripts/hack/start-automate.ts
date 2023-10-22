@@ -16,17 +16,8 @@ export async function main(ns: NS): Promise<void> {
   // Server list of targets (target of scripts)
   let targetList = prepareServerTargetList(ns, nukedServers);
 
-  
-  let target = getTarget(ns, targetList); 
 
-  
-  
-  
-
-
-
-
-
+  let target = getTarget(ns, targetList);
 
   // Let all hosts target 1 server
   // let target = targetList[0];
@@ -35,7 +26,7 @@ export async function main(ns: NS): Promise<void> {
     ns.tprint("Target is undefined");
     ns.exit();
   } else {
-    ns.tprint("Targeting: " + target);
+    ns.print("Targeting: " + target);
   }
 
   let waitTime = 0;
@@ -45,26 +36,26 @@ export async function main(ns: NS): Promise<void> {
     // Upload HGW scripts to host
     uploadScripts(ns, host, scriptsHGW);
 
-    // host data 
+    // host data
     let ramMax = ns.getServerMaxRam(host);
     let ramUsed = ns.getServerUsedRam(host);
 
     // target data
-    let moneyCurr = ns.getServerMoneyAvailable(target); 
+    let moneyCurr = ns.getServerMoneyAvailable(target);
     let moneyThresh = ns.getServerMaxMoney(target) * 0.9;
     let secCurr = ns.getServerSecurityLevel(target);
-    let secThresh = ns.getServerMinSecurityLevel(target) + 3;
+    let secThresh = ns.getServerMinSecurityLevel(target) + 2;
+
 
     // determine action
     let action = "";
-    if (moneyCurr < moneyThresh) {
-      action = "Grow";
-    } else if (secCurr > secThresh) {
+    if (secCurr > secThresh) {
       action = "Weaken";
+    } else if (moneyCurr < moneyThresh) {
+      action = "Grow";
     } else {
       action = "Hack";
     }
-
 
     // Get script / action time
     let script : string = "";
@@ -79,9 +70,8 @@ export async function main(ns: NS): Promise<void> {
         script = Defaults.scriptWeaken; actionTime = ns.getWeakenTime(target); break;
     }
 
-    if (script == "") { ns.tprint("script be empty. js fuckjed up again what a suprise") }
     let scriptRam = ns.getScriptRam(script);
-    
+
     let threadsAvailable = Math.floor((ramMax - ramUsed) /  scriptRam);
     if (threadsAvailable === 0) continue;
 
@@ -93,7 +83,7 @@ export async function main(ns: NS): Promise<void> {
     let pid = ns.exec(script, host, threadsAvailable, target);
     if (pid === 0) continue;
   }
-  
+
   waitTime += 5000; // add 5 sec margin
   ns.printf("Sleeping for %d mins, %d sec", (waitTime/1000)/60, (waitTime/1000) );
   await ns.sleep(waitTime);
@@ -129,13 +119,13 @@ function prepareServerTargetList(ns: NS, serverArray: string[]) : string[] {
   let hackableServersList = serverArray.filter((srv) => {
     return ns.getServerRequiredHackingLevel(srv) <= playerHackingThreshold
   });
-  
+
   // Return list sorted by max money
   return rankServerByMaxMoney(ns, hackableServersList);
 }
 
 /**
- * Sort list of host servers by maximum RAM and remove servers that 
+ * Sort list of host servers by maximum RAM and remove servers that
  * have active scripts. Only keeps idling servers in the list.
  * @param ns NS API
  * @param serverArray Server list
@@ -154,8 +144,8 @@ function prepareServerHostList(ns:NS, serverArray: string[]) : string[] {
 
 /**
  * Sort list of server by Max RAM in descending order
- * @param ns 
- * @param serverArray 
+ * @param ns
+ * @param serverArray
  */
 function rankServerByMaxRam(ns: NS, serverArray: string[]) : string[] {
   serverArray.sort((srvA, srvB) : number => {
@@ -175,8 +165,8 @@ function rankServerByMaxRam(ns: NS, serverArray: string[]) : string[] {
 
 /**
  * Sort list of server by Max Money in descending order
- * @param ns 
- * @param serverArray 
+ * @param ns
+ * @param serverArray
  */
 function rankServerByMaxMoney(ns: NS, serverArray: string[]) : string[] {
     // Sort targetList by Server Money in descending
@@ -195,7 +185,7 @@ function rankServerByMaxMoney(ns: NS, serverArray: string[]) : string[] {
 }
 
 
-// Archive 
+// Archive
 // for (let host of hostList) {
 //   let ramMax = ns.getServerMaxRam(host);
 //   let ramUsed = ns.getServerUsedRam(host);

@@ -1,22 +1,32 @@
 import { NS } from "@ns";
 
-export async function main(ns: NS): Promise<void> {
-    let target = "joesguns"
-    if (ns.args.length > 0) {
-        target = <string> ns.args[0];
-    }
+import * as Defaults from "scripts/utils/defaults"
+import { uploadScripts } from "/scripts/utils/hack-utils";
 
-    while (ns.getHackingLevel() < 100) {
-        // Grow or Weaken
-        if (ns.getServerSecurityLevel(target) > ns.getServerBaseSecurityLevel(target)) {
-            await ns.weaken(target);
-        } else {
-            await ns.grow(target)
+export async function main(ns: NS): Promise<void> {
+    const script = Defaults.scriptXP;
+    
+    // Get hosts within home range that are rooted
+    let hostList = ns.scan(Defaults.home).filter(srv => ns.hasRootAccess(srv));
+
+
+    // Add home and p-servs to hosts
+    hostList.concat(Defaults.home);
+    hostList.concat(ns.getPurchasedServers());
+
+    let target = Defaults.xpFarmTargets[0];
+
+    for (let i = 0; i < hostList.length; i++) {
+        let host = hostList[i];      
+        if (i == Math.floor(hostList.length/2)) {
+            target = Defaults.xpFarmTargets[1];
         }
-        
-        // random chance of hacking cuz why not
-        if (Math.random() > 0.50 && Math.random() < 0.57) {
-            await ns.hack(target);
-        }
+
+        let threads = Math.floor((ns.getServerMaxRam(host) - ns.getServerUsedRam(host)) / ns.getScriptRam(script))
+
+
+        uploadScripts(ns, host, script);
+
+        ns.exec(script, host, threads, target);
     }
 }
