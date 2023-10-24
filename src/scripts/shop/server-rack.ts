@@ -19,8 +19,8 @@ export async function main(ns: NS): Promise<void> {
     }
 
     // Check if has servers
-    emptySlots = ns.getPurchasedServerLimit() - srvCount;
-    if (emptySlots != 0) {
+    srvCount = ns.getPurchasedServers().length;
+    if (srvCount != 0) {
         // Upgrade RAM of servers in rack if not at max
         let rackCanUpgrade = !isRackAtMaximumRam(ns);
         if (rackCanUpgrade)  {
@@ -28,7 +28,6 @@ export async function main(ns: NS): Promise<void> {
             await ns.sleep(5000);
         }
     }
-
 
 
     ns.print("Count: " + ns.getPurchasedServers().length)
