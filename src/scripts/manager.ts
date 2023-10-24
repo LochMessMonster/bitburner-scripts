@@ -1,31 +1,29 @@
 import { NS } from "@ns";
 
-// import * as Defaults from "../utils/defaults"
-import * as Defaults from "scripts/utils/defaults"
-import {uploadScripts, loadServerFile} from "scripts/utils/hack-utils"
+import * as Defaults from "scripts/utils/defaults";
 
 export async function main(ns: NS): Promise<void> {
-    ns.tprint("Starting manager");
     // Enforce only 1 instance of manager
     // if (ns.isRunning(scriptManager)) {
     //     // ns.killall(home, true);
     //     ns.tprint("Please stop other instances of manager.")
     //     ns.exit();
     // }
-    
+
     // Calculate time since last augment reset
     let timeSinceLastAugMs = Math.abs(Date.now() - ns.getResetInfo().lastAugReset);
     let timeSinceLastAugMin = Math.floor((timeSinceLastAugMs / 1000) / 60);
 
     ns.tprintf("Time since last aug reset: %ds | %d mins | %d hrs", timeSinceLastAugMs / 1000, timeSinceLastAugMin, timeSinceLastAugMin / 60);
 
-    // if aug-reset was less than 10mins, cold start
-    if (timeSinceLastAugMin < 10) {
+    // Cold start if not at xp threshold
+    if (ns.getHackingLevel() < Defaults.xpThreshold) {
         ns.tprint("Cold Start.");
         await coldStart(ns);
     }
 
-    
+    // Start normal manager
+    ns.tprint("Starting manager");
     await manage(ns);
 
     // Exit message
@@ -47,6 +45,8 @@ async function manage(ns: NS) {
 
         // purchase and fill up server rack
         ns.run(Defaults.scriptServerRack);
+        // purchase basic hackent nodes
+        ns.run(Defaults.scriptHacknet);
         // purchase useful items
         // ns.run(scriptShopping);
 
@@ -71,29 +71,35 @@ async function hotStart(ns: NS, spiderDepth: number) {
     // Run auto-start
 
     let pid = ns.run(Defaults.scriptStart, 1);
-    // poll auto-start script if still running every 30 sec 
-    // if (pid == 0) {ns.tprint("ERROR"); ns.exit(); }
+    // if pid is 0, script failed
+    if (pid == 0) {ns.tprint("ERROR"); ns.exit(); }
 
-    await (ns.sleep(60000)) // 1 min
+    // poll auto-start script if still running every 30 sec
+    while (ns.isRunning(pid)) { await ns.sleep(30000); }
 }
 
+/**
+ * Cold Start is run after a reset to farm HackLevel to specified threshold
+ * @param ns NS API
+ */
 async function coldStart(ns: NS) {
-    // const levelThreshold = 100;
-    // let levelCurr = 0;
+    const levelThreshold = Defaults.xpThreshold;
+    let levelCurr = 0;
 
-    // // Open up early servers
-    // ns.run(scriptSpider);
-    // await ns.sleep(15);
+    while (levelCurr <= levelThreshold) {
+        levelCurr = ns.getHackingLevel();
+        // Open up early servers
+        ns.run(Defaults.scriptStop);
+        ns.run(Defaults.scriptSpider);
+        await ns.sleep(5000);   // 5 sec
 
-    // while (levelCurr <= levelThreshold) {
-    //     levelCurr = ns.getHackingLevel();
-    //     // Start XP farm
-    //     if (levelCurr < levelThreshold) {
-    //         ns.run(scriptXpFarm); // is this needed?
-    //         await hotStart(ns, 50);
-    //     }
-    //     await ns.sleep(300000); // 5 mins
-    // }
+        // Start XP farm
+        ns.run(Defaults.scriptXPFarm);
 
-    // ns.tprintf("Hacking level %d reached. Cold start finished.", levelCurr);
+        await ns.sleep(120000); // 2 mins
+    }
+
+
+    ns.tprintf("Hacking level %d reached. Cold start finished.", levelCurr);
+    ns.run(Defaults.scriptStop);
 }

@@ -2,50 +2,63 @@ import { NS } from "@ns";
 
 // import * as Defaults from "../utils/defaults"
 import * as Defaults from "scripts/utils/defaults"
-// import {uploadScripts, loadServerFile} from "scripts/utils/hack-utils"
+import { getPlayerMoney } from "scripts/utils/player-utils"
 
 export async function main(ns: NS): Promise<void> {
     // server rack data
     let srvList = ns.getPurchasedServers();
-    let srvCount = srvList.length;
+    let srvCount =  (srvList.length > 0) ? srvList.length : 0;
     let emptySlots = ns.getPurchasedServerLimit() - srvCount;
-    // money available leaving aside the reserve
-    let moneyAvailable = ns.getServerMoneyAvailable(Defaults.home) - Defaults.reserveMoney;
+    
     
     // Fill up rack if not filled
     let rackHasEmptySlots = emptySlots > 0;
     if (rackHasEmptySlots) {
-        fillRack(ns, Defaults.psrvRamMin, moneyAvailable, emptySlots, srvCount);
-        ns.sleep(1000);
-    }
-    // Upgrade RAM of servers in rack if not at max
-    let rackCanUpgrade = !isRackAtMaximumRam(ns);
-    if (rackCanUpgrade)  {
-        upgradeRack(ns);
-        await ns.sleep(1000);
+        fillRack(ns, Defaults.psrvRamMin, emptySlots, srvCount);
+        await ns.sleep(5000);
     }
 
-    ns.tprint("Count: " + ns.getPurchasedServers().length)
-    ns.tprint("Rack Filled: " + isRackFull(ns));
-    ns.tprint("Max Ram: " + isRackAtMaximumRam(ns));
+    // Check if has servers
+    srvCount = ns.getPurchasedServers().length;
+    if (srvCount != 0) {
+        // Upgrade RAM of servers in rack if not at max
+        let rackCanUpgrade = !isRackAtMaximumRam(ns);
+        if (rackCanUpgrade)  {
+            upgradeRack(ns);
+            await ns.sleep(5000);
+        }
+    }
+
+
+    ns.print("Count: " + ns.getPurchasedServers().length)
+    ns.print("Rack Filled: " + isRackFull(ns));
+    ns.print("Max Ram: " + isRackAtMaximumRam(ns));
     // return  {"FULL": !rackHasEmptySlots, "MAXED": !rackCanUpgrade }; 
 }
 
 // Fill up rack based on current money
-function fillRack(ns: NS, ram: number, currentMoney: number, emptySlots: number, srvCount: number) : boolean {
+function fillRack(ns: NS, ram: number, emptySlots: number, srvCount: number) : boolean {
+    // money available leaving aside the reserve
+    let moneyAvailable = getPlayerMoney(ns);
+
     // No empty slots
     if (emptySlots <= 0) { return false; }
 
     let baseCost = ns.getPurchasedServerCost(ram);
-    let purchaseAmt = Math.floor(currentMoney/baseCost);
 
-    if (purchaseAmt > 0) {
-        // if amt greather than available slots, clamp down
-        if (purchaseAmt >= emptySlots) { purchaseAmt = emptySlots; }
+    if (moneyAvailable > baseCost) {
+        let purchaseAmt = Math.floor(moneyAvailable/baseCost);
 
-        // purchase specified amt and update empty slot count
-        emptySlots -= purchase(ns, purchaseAmt, ram, srvCount);
+        if (purchaseAmt > 0) {
+            // if amt greather than available slots, clamp down
+            if (purchaseAmt >= emptySlots) { purchaseAmt = emptySlots; }
+    
+            // purchase specified amt and update empty slot count
+            emptySlots -= purchase(ns, purchaseAmt, ram, srvCount);
+        }
     }
+
+    
     // returns whether rack is empty
     return (emptySlots > 0);
 }
@@ -56,7 +69,7 @@ function upgradeRack(ns:NS) {
     let srvList = ns.getPurchasedServers();
 
     // let isMaxRam = isRackAtMaximumRam(ns);
-    let currentMoney = ns.getServerMoneyAvailable(Defaults.home) - Defaults.reserveMoney;
+    let currentMoney = getPlayerMoney(ns);
     const maxRam = Math.min(ns.getPurchasedServerMaxRam(), Defaults.psrvMaxMax);
 
     // // ram already maxed
@@ -137,43 +150,3 @@ function isRackFull(ns:NS) {
     let emptySlots = ns.getPurchasedServerLimit() - ns.getPurchasedServers().length
     return (emptySlots == 0)
 }
-
-
-// const serverPrefix = "srv-";
-// const home = "home"
-// const minRamPurchase = 8;
-// const upgradeLimit = "8 TB"//format
-
-// /** @param {import("..").NS } ns */
-// export async function main(ns) {
-//     let status = maintainRack(ns);
-//     ns.print(status);
-//     return status;
-// }
-
-// /** @param {import("..").NS } ns */
-// function maintainRack(ns) {
-//     let srvList = ns.getPurchasedServers();
-//     let srvCount = srvList.length;
-//     let emptySlots = ns.getPurchasedServerLimit() - srvCount;
-//     let currentMoney = ns.getServerMoneyAvailable(home);
-//     let rackHasEmptySlots = emptySlots > 0;
-//     let rackCanUpgrade = true;
-
-//     // If rack has empty slots, try to fill it
-//     if (rackHasEmptySlots) {
-//         rackHasEmptySlots = fillRack(ns, minRamPurchase, currentMoney, emptySlots, srvCount);
-//     }
-
-//     return  {"FULL": !rackHasEmptySlots, "MAXED": !rackCanUpgrade }; 
-// }
-
-// /** @param {import("..").NS } ns */
-
-
-// function upgradeRack(ns, currentMoney, srvList) {}
-
-
-
-// // Upgrade all servers to specified ram
-// // function upgrade(ns, srv, ram) { }
