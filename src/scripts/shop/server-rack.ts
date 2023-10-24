@@ -2,7 +2,7 @@ import { NS } from "@ns";
 
 // import * as Defaults from "../utils/defaults"
 import * as Defaults from "scripts/utils/defaults"
-// import {uploadScripts, loadServerFile} from "scripts/utils/hack-utils"
+import { getPlayerMoney } from "scripts/utils/player-utils"
 
 export async function main(ns: NS): Promise<void> {
     // server rack data
@@ -39,7 +39,7 @@ export async function main(ns: NS): Promise<void> {
 // Fill up rack based on current money
 function fillRack(ns: NS, ram: number, emptySlots: number, srvCount: number) : boolean {
     // money available leaving aside the reserve
-    let moneyAvailable = ns.getServerMoneyAvailable(Defaults.home) - Defaults.reserveMoney;
+    let moneyAvailable = getPlayerMoney(ns);
 
     // No empty slots
     if (emptySlots <= 0) { return false; }
@@ -69,7 +69,7 @@ function upgradeRack(ns:NS) {
     let srvList = ns.getPurchasedServers();
 
     // let isMaxRam = isRackAtMaximumRam(ns);
-    let currentMoney = ns.getServerMoneyAvailable(Defaults.home) - Defaults.reserveMoney;
+    let currentMoney = getPlayerMoney(ns);
     const maxRam = Math.min(ns.getPurchasedServerMaxRam(), Defaults.psrvMaxMax);
 
     // // ram already maxed

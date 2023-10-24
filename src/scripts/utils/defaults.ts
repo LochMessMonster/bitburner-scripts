@@ -5,7 +5,7 @@ export const home               = "home";
 export const homeMaxRam         = 8192;     // 16 TB - increase later
 
 // reserve level of X that scripts will leave
-export const reserveMoney       = 250000;   // 800k
+export const reserveMoney       = 1500000;   // 800k
 export const reserveRam         = 64;       // 16 gb
 
 // purchased server defaults
