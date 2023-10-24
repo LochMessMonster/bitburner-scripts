@@ -96,7 +96,7 @@ async function coldStart(ns: NS) {
         // Start XP farm
         ns.run(Defaults.scriptXPFarm);
 
-        await ns.sleep(30000); // 30 sec
+        await ns.sleep(120000); // 2 mins
     }
 
 
