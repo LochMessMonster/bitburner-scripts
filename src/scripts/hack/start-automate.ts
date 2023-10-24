@@ -14,7 +14,7 @@ export async function main(ns: NS): Promise<void> {
   let nukedServers = loadServerFile(ns, Defaults.filepathTarget);
   // Server list of hosts (runs the scripts)
   let hostList = prepareServerHostList(ns, ns.getPurchasedServers().concat(nukedServers));
-  hostList.push(Defaults.home);
+  // hostList.push(Defaults.home);
 
   // Server list of targets (target of scripts)
   let targetList = prepareServerTargetList(ns, nukedServers);
