@@ -45,6 +45,8 @@ async function manage(ns: NS) {
 
         // purchase and fill up server rack
         ns.run(Defaults.scriptServerRack);
+        // purchase basic hackent nodes
+        ns.run(Defaults.scriptHacknet);
         // purchase useful items
         // ns.run(scriptShopping);
 

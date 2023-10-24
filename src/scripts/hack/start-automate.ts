@@ -4,6 +4,7 @@ import { NS } from "@ns";
 // import * as Defaults from "../utils/defaults"
 import * as Defaults from "scripts/utils/defaults"
 import {uploadScripts, loadServerFile} from "scripts/utils/hack-utils"
+import { getPlayerHomeRam } from "scripts/utils/player-utils"
 
 // Because typescript is a Karen who can't fucking deal with Objects
 let scriptsHGW = [Defaults.scriptGrow, Defaults.scriptHack, Defaults.scriptWeaken]
@@ -13,15 +14,14 @@ export async function main(ns: NS): Promise<void> {
   let nukedServers = loadServerFile(ns, Defaults.filepathTarget);
   // Server list of hosts (runs the scripts)
   let hostList = prepareServerHostList(ns, ns.getPurchasedServers().concat(nukedServers));
+  hostList.push(Defaults.home);
+
   // Server list of targets (target of scripts)
   let targetList = prepareServerTargetList(ns, nukedServers);
 
 
   let target = getTarget(ns, targetList);
 
-  // Let all hosts target 1 server
-  // let target = targetList[0];
-  // let target = "phantasy";
   if (target === undefined) {
     ns.tprint("Target is undefined");
     ns.exit();
@@ -36,9 +36,8 @@ export async function main(ns: NS): Promise<void> {
     // Upload HGW scripts to host
     uploadScripts(ns, host, scriptsHGW);
 
-    // host data
-    let ramMax = ns.getServerMaxRam(host);
-    let ramUsed = ns.getServerUsedRam(host);
+    // host data 
+    let ramFree = (host !== Defaults.home) ? ns.getServerMaxRam(host) - ns.getServerUsedRam(host) : getPlayerHomeRam(ns);
 
     // target data
     let moneyCurr = ns.getServerMoneyAvailable(target);
@@ -72,7 +71,7 @@ export async function main(ns: NS): Promise<void> {
 
     let scriptRam = ns.getScriptRam(script);
 
-    let threadsAvailable = Math.floor((ramMax - ramUsed) /  scriptRam);
+    let threadsAvailable = Math.floor(ramFree /  scriptRam);
     if (threadsAvailable === 0) continue;
 
 
