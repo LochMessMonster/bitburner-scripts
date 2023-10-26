@@ -1,5 +1,6 @@
 import { NS } from "@ns";
 import { Stack, Contract } from "scripts/utils/classes";
+import { storeContract } from "scripts/utils/contract-utils";
 import * as Defaults from "scripts/utils/defaults"
 
 const extension = ".cct"
@@ -44,37 +45,5 @@ export async function finder(ns: NS): Promise<void> {
     }
 
     // Output contract list
-    storeContract(ns, foundContracts);
-}
-
-/**
- * Store the provided list of contracts to location specified 
- * in Defaults. File is stored in CSV format (`.csv.txt`). 
- * @param ns NS API
- * @param contractList Array of contracts
- */
-function storeContract(ns:NS, contractList: Contract[]) {
-    if (ns.fileExists(Defaults.filepathContracts)) {
-        ns.rm(Defaults.filepathContracts);
-    }
-
-    ns.print("Found %d contracts. Saving to %s", contractList.length, Defaults.filepathContracts);
-
-    for (const contract of contractList) {
-        ns.write(Defaults.filepathContracts, prepareString(contract), "a" );
-    }
-}
-
-/**
- * Returns tring representation of Contract in CSV format.
- * Planned to implement toString method to simplify this.
- * @param contract Contract object
- * @returns String representation of contract in CSV.
- */
-function prepareString (contract: Contract) : string {
-    let prepare = "";
-    prepare += contract.filename    + ", ";
-    prepare += contract.server      + ", ";
-    prepare += contract.solved      + "\n";
-    return prepare;
+    storeContract(ns, foundContracts, Defaults.filepathContracts);
 }
