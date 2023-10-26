@@ -26,6 +26,7 @@ export const xpThreshold        = 50;
 export const filepathTarget     = "servers/nuked.txt"
 export const filepathFailed     = "servers/failed.txt"
 export const filepathBlacklist  = "servers/blacklist.txt"
+export const filepathContracts  = "data/contracts.csv.txt"
 
 // script name
 // export const scriptsHGW : Script[] = [

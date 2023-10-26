@@ -58,6 +58,11 @@ export class Stack<T> {
     }
 }
 
+export interface Contract {
+    filename: string,
+    server: string,
+    solved: boolean
+}
 
 export interface Port {
     name: string,
