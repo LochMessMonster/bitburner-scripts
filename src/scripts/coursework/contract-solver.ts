@@ -41,3 +41,57 @@ export async function solver(ns: NS): Promise<void> {
 
     storeContract(ns, contractList, Defaults.filepathContracts);
 }
+
+function solve(contractType: string, inputData: any) : any {
+    let result;
+    switch(contractType) {
+        case "Array Jumping Game":
+            result = arrayJump(inputData);
+            break;
+        case "Compression I: RLE Compression":
+            result = rteCompression(inputData);
+            break;
+    }
+
+    return result;
+}
+
+// --------------- Contract solutions --------------- //
+
+// Compression : Run-Time Encoding
+function rteCompression(inputData: string) : string {
+    let arr = inputData.toString().trim().split("");
+    let encoding = "";
+    let charCount = 0, charCurrent = arr[0];
+
+    for (const char of arr) {
+        // If diff char or hit limit of 9
+        if ((charCurrent !== char) || (charCount == 9)) {
+            encoding += charCount.toString() + charCurrent;
+            
+            charCurrent = char;
+            charCount = 1;
+        } else {
+            charCount += 1;
+        }
+    }
+    // Add final 
+    encoding += charCount.toString() + charCurrent;
+
+    return encoding;
+}
+
+
+// UNTESTED - Might be wrong
+function arrayJump(inputData: number[]) : number {
+    let len = inputData.length;
+    let jump = inputData[0];
+
+    if (inputData.length < 1) { return 0; }
+
+    for (let i = 1; i < len; i++) {
+        if (jump == 0) { return 0; }
+        jump = Math.max( jump - 1, inputData[i] );
+    }
+    return 1;
+}
