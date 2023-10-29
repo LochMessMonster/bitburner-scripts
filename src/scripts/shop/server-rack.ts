@@ -65,12 +65,14 @@ function fillRack(ns: NS, ram: number, emptySlots: number, srvCount: number) : b
 
 // Upgrade servers in rack to maximum possible
 function upgradeRack(ns:NS) {
-    // Retrieve server list as it may have changed in fillRack()
-    let srvList = ns.getPurchasedServers();
-
     // let isMaxRam = isRackAtMaximumRam(ns);
     let currentMoney = getPlayerMoney(ns);
     const maxRam = Math.min(ns.getPurchasedServerMaxRam(), Defaults.psrvMaxMax);
+
+    // Retrieve list of servers not maxed
+    let srvList = ns.getPurchasedServers().filter(srv => (ns.getServerMaxRam(srv) <= maxRam));
+    // Sort list by RAM in ascending order
+    srvList.sort((srvA, srvB) => (ns.getServerMaxRam(srvA) - ns.getServerMaxRam(srvB)));
 
     // // ram already maxed
     // if (isMaxRam) { return; }
