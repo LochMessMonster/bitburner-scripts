@@ -16,7 +16,7 @@ export async function main(ns: NS): Promise<void> {
  * @returns True if it successfully deletes, and false otherwise.
  */
 function remove(ns:NS, path: string) : boolean {
-    let fileList = ns.ls(Defaults.home).filter(file => file.startsWith(path));
+    let fileList = ns.ls(ns.getHostname()).filter(file => file.startsWith(path));
 
     // If no files found or filepath is empty
     if ((fileList.length < 1) || (path === "")) { return false; }
