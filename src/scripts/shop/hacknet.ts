@@ -12,9 +12,9 @@ export async function main(ns: NS): Promise<void> {
 
 function purchaseNodes (ns: NS) {
     let numNodes = ns.hacknet.numNodes();
+    let maxNodes = Defaults.hacknetNodeLimit;
 
-    if (numNodes > 0) {
-        let maxNodes = Defaults.hacknetNodeLimit;
+    if (numNodes < maxNodes) {
 
         if (numNodes >= maxNodes) { return; }
 
