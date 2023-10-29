@@ -1,5 +1,7 @@
 import { NS } from "@ns";
 
+import * as Defaults from "scripts/utils/defaults"
+
 const commands = ["remove", "copy", "move"];
 
 
@@ -19,26 +21,4 @@ export async function main(ns: NS): Promise<void> {
         ns.tprint("Error");
         ns.exit();
     }
-}
-
-function xargs (ns:NS, sourceScript:string, sourceScriptArgs: string[], destScript: string) {
-    if (!ns.fileExists(sourceScript) || !ns.fileExists(destScript)) {
-        ns.print("ERROR - Either source or destination script don't exist.");
-    }
-
-
-
-}
-
-
-
-
-function copy(ns:NS, source:string, destination: string) {
-    
-
-
-
-
-
-
 }
